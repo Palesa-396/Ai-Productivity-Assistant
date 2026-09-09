@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import logo from "@/assets/fieldnote-logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/auth/callback")({
+export const Route = createFileRoute("/auth_/callback")({
   head: () => ({
     meta: [
       { title: "Confirm your account — Fieldnote" },
