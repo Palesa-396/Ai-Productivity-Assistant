@@ -49,7 +49,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: { display_name: name },
           },
         });
@@ -80,10 +80,36 @@ function AuthPage() {
   async function google() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) {
       toast.error("Google sign-in didn't work. Please try again.");
+    }
+  }
+
+  async function resendConfirmation() {
+    if (!email) {
+      toast.error("Enter your email address first.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      toast.success("A new confirmation link is on its way.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "The email could not be resent.",
+      );
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -139,6 +165,16 @@ function AuthPage() {
           >
             {mode === "signin" ? "Sign in" : "Create account"}
           </button>
+          {mode === "signup" && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={resendConfirmation}
+              className="w-full py-1 text-xs font-medium text-muted-foreground hover:text-foreground disabled:opacity-60"
+            >
+              Resend confirmation email
+            </button>
+          )}
         </form>
 
         <button
