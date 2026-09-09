@@ -87,6 +87,32 @@ function AuthPage() {
     }
   }
 
+  async function resendConfirmation() {
+    if (!email) {
+      toast.error("Enter your email address first.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) throw error;
+      toast.success("A new confirmation link is on its way.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "The email could not be resent.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="relative isolate flex min-h-screen items-center justify-center bg-background px-6 font-sans">
       <div className="pointer-events-none absolute -top-32 -right-24 size-[460px] rounded-full bg-mint/60 blur-3xl" />
@@ -139,6 +165,16 @@ function AuthPage() {
           >
             {mode === "signin" ? "Sign in" : "Create account"}
           </button>
+          {mode === "signup" && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={resendConfirmation}
+              className="w-full py-1 text-xs font-medium text-muted-foreground hover:text-foreground disabled:opacity-60"
+            >
+              Resend confirmation email
+            </button>
+          )}
         </form>
 
         <button
