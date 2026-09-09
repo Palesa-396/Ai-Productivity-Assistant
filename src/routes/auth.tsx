@@ -54,7 +54,13 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        toast.success("Account created. Welcome to Fieldnote.");
+        if (data.session) {
+          toast.success("Account created. Welcome to Fieldnote.");
+        } else {
+          toast.success(
+            "Almost there — check your inbox and click the confirmation link.",
+          );
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
