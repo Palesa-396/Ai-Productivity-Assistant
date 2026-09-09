@@ -33,6 +33,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
   const { session } = useAuth();
   const navigate = useNavigate();
 
