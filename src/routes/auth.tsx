@@ -33,6 +33,8 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState("");
   const { session } = useAuth();
   const navigate = useNavigate();
 
@@ -57,9 +59,8 @@ function AuthPage() {
         if (data.session) {
           toast.success("Account created. Welcome to Fieldnote.");
         } else {
-          toast.success(
-            "Almost there — check your inbox and click the confirmation link.",
-          );
+          setPendingEmail(email);
+          setShowConfirmationModal(true);
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -193,6 +194,46 @@ function AuthPage() {
             : "Already have an account? Sign in"}
         </button>
       </div>
+
+      {showConfirmationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
+          <div className="rise w-full max-w-sm rounded-3xl bg-background p-6 text-center shadow-xl">
+            <div className="mx-auto grid size-12 place-items-center rounded-full bg-mint text-lg">
+              ✉️
+            </div>
+            <h2 className="mt-4 font-display text-xl font-semibold tracking-tight">
+              Check your inbox
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              We sent a confirmation link to{" "}
+              <span className="font-medium text-foreground">{pendingEmail}</span>.
+              Click the link in that email to confirm your account and access
+              your profile.
+            </p>
+            <div className="mt-5 flex flex-col gap-2">
+              <button
+                onClick={() => {
+                  setMode("signin");
+                  setShowConfirmationModal(false);
+                }}
+                className="w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground"
+              >
+                Go to sign in
+              </button>
+              <button
+                onClick={() => {
+                  setShowConfirmationModal(false);
+                  resendConfirmation();
+                }}
+                disabled={busy}
+                className="w-full rounded-xl border border-input bg-background py-2.5 text-sm font-semibold text-foreground disabled:opacity-60"
+              >
+                Resend email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
