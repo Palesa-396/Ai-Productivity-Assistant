@@ -71,7 +71,7 @@ function Home() {
   if (loading || !user) return null;
 
   const name =
-    (user.user_metadata?.display_name as string | undefined) ??
+    (user.user_metadata?.["display_name"] as string | undefined) ??
     user.email?.split("@")[0] ??
     "there";
 
